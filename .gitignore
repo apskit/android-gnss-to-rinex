@@ -1,0 +1,17 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+test.17o
+src/test/
+.idea/
+*.iws
+*.iml
+*.ipr
+.gradle/
+build/
+/build/
+!gradle-wrapper.jar
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
