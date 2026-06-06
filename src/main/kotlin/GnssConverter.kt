@@ -80,12 +80,23 @@ class GnssConverter {
     fun convert(
         inputFile: File,
         outputFile: File,
+        navOutputFile: File? = null,
         integerize: Boolean = false,
         useFixedFullBias: Boolean = false
     ) {
         val parser = GnssLogParser()
         val processor = MeasurementProcessor(integerize, useFixedFullBias)
         val formatter = RinexFormatter()
+
+        // Generate placeholder Navigation File (TODO)
+        if (navOutputFile != null) {
+            val navStats = parser.getNavStatistics(inputFile)
+
+            navOutputFile.bufferedWriter().use { writer ->
+                val navFormatter = RinexNavFormatter()
+                navFormatter.writeNavHeader(writer, navStats)
+            }
+        }
 
         // Start file parser
         parser.parseMeasurements(inputFile) { rawSequence ->

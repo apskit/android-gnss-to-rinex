@@ -80,4 +80,36 @@ class GnssLogParser {
             return null
         }
     }
+
+    /**
+     * Scan through a file to analyze navigation logs
+     * Returns a map of counted messages, broken down into constellation and signal type.
+     */
+    fun getNavStatistics(file: File): Map<String, Int> {
+        val stats = mutableMapOf<String, Int>()
+
+        file.useLines { lines ->
+            for (line in lines) {
+                if (line.startsWith("Nav,")) {
+                    val parts = line.split(",")
+                    if (parts.size >= 3) {
+                        val typeId = parts[2].trim().toIntOrNull() ?: continue
+
+                        val sysName = when (typeId) {
+                            257 -> "GPS (L1 C/A)"       // 0x0101
+                            258 -> "GPS (L2-CNAV)"      // 0x0102
+                            769 -> "GLONASS (L1 C/A)"   // 0x0301
+                            1281 -> "BEIDOU (D1)"       // 0x0501
+                            1282 -> "BEIDOU (D2)"       // 0x0502
+                            1537 -> "GALILEO (I/NAV)"   // 0x0601
+                            1538 -> "GALILEO (F/NAV)"   // 0x0602
+                            else -> "UNKNOWN TYPE ($typeId)"
+                        }
+                        stats[sysName] = stats.getOrDefault(sysName, 0) + 1
+                    }
+                }
+            }
+        }
+        return stats
+    }
 }
